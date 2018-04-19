@@ -48,4 +48,12 @@ module.exports = {
             console.error(err);
         }
     },
+    deletePlaylist: async (id) => {
+        try {
+            await db.collection('playlists').doc(id).delete();
+            return;
+        } catch (err) {
+            return { error: err }
+        }
+    }
 };

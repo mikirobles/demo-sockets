@@ -29,7 +29,21 @@ nextApp.prepare().then(() => {
 });
 
 io.on('connect', socket => {
-    socket.emit('now', {
-        message: 'zeit',
+    socket.on('delete playlist', ({playlist}) => {
+        socket.broadcast.emit('notification', {
+            message: `${playlist.author} eliminó la playlist '${playlist.name}'`
+        });
+        socket.broadcast.emit('updatePlaylists');
+    });
+    socket.on('create playlist', ({ playlist }) => {
+        socket.broadcast.emit('notification', {
+            message: `${playlist.author} creó una nueva playlist llamada '${playlist.name}'`,
+        });
+        socket.broadcast.emit('updatePlaylists');
+    });
+    socket.on('user logged', ({ name }) => {
+        socket.broadcast.emit('notification', {
+            message: `${name} entró a la app!`,
+        });
     });
 });

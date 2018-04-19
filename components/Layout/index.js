@@ -1,5 +1,9 @@
 import styled from 'styled-components';
-import { styleConstants} from "helpers/index";
+import { styleConstants } from 'helpers/index';
+import React from 'react';
+import io from 'socket.io-client';
+
+import  {NotificationContainer, NotificationManager } from 'react-notifications';
 
 const { colors, breakpoints } = styleConstants;
 
@@ -19,16 +23,28 @@ const LayoutWrapper = styled.div`
         padding: 1em;
     }
     @media ${breakpoints.tabletPort} {
-      article {
-        padding: 1em;
-      }
+        article {
+            padding: 1em;
+        }
     }
+    
 `;
 
-export default ({ children }) => (
-    <LayoutWrapper>
-        <article>
-            {children}
-        </article>
-    </LayoutWrapper>
-);
+export default class extends React.Component {
+    componentDidMount() {
+        window.appSocket = io.connect('http://192.168.0.120:3000/');
+        appSocket.on('notification', (data) => {
+            NotificationManager.info(data.message);
+        })
+    }
+
+    render() {
+        const { children } = this.props;
+        return (
+            <LayoutWrapper>
+                <article>{children}</article>
+                <NotificationContainer/>
+            </LayoutWrapper>
+        );
+    }
+}

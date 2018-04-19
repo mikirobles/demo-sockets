@@ -7,14 +7,17 @@ import axios from 'axios';
 
 export default class extends React.Component {
     createPlaylist(name) {
-        axios
-            .post('/api/new/playlist', {
-                name: name,
-                author: window.localStorage.getItem('name'),
-            })
-            .then(_ => {
-                window.location.replace('/');
+        const playlist = {
+            name: name,
+            author: window.localStorage.getItem('name')
+        };
+        axios.post('/api/new/playlist', playlist).then(_ => {
+            window.appSocket.emit('create playlist', {
+                name: window.localStorage.getItem('name'),
+                playlist
             });
+            window.location.replace('/');
+        });
     }
 
     render() {
@@ -24,15 +27,19 @@ export default class extends React.Component {
                     {props => (
                         <React.Fragment>
                             <h1>Nombre de la playlist:</h1>
-                            <Input {...props} type="text" />
-                            <Button
-                                onClick={() =>
-                                    this.createPlaylist(props.inputValue)
-                                }
-                                style={{ margin: 'auto' }}
-                            >
-                                Crear
-                            </Button>
+                            <form>
+                                <Input {...props} type="text" />
+                                <Button
+                                    type={'submit'}
+                                    onClick={e => {
+                                        e.preventDefault();
+                                        this.createPlaylist(props.inputValue);
+                                    }}
+                                    style={{ margin: 'auto' }}
+                                >
+                                    Crear
+                                </Button>
+                            </form>
                         </React.Fragment>
                     )}
                 </WithInput>
